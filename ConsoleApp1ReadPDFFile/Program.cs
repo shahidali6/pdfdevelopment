@@ -12,7 +12,8 @@ namespace ConsoleApp1ReadPDFFile
 {
     internal class Program
     {
-
+        //URL to download all PDF files
+        //https://www.dropbox.com/sh/h3ndhmoieoyl4g8/AABmxrOUBKIIXAUJPx5GtFpOa?dl=0
         static void Main(string[] args)
         {
             string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
@@ -33,6 +34,7 @@ namespace ConsoleApp1ReadPDFFile
             int loopCounter = 1;
             foreach (var file in fileNames)
             {
+                File.AppendAllText("allFiles.txt", file+Environment.NewLine);
                 //string normal = String.Empty;
                 //stringBuilder.AppendLine(loopCounter + ": " + file + newLine);
                 stringBuilder.AppendLine(file + newLine);
