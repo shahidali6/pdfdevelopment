@@ -16,10 +16,12 @@ namespace ConsoleApp1ReadPDFFile
         //https://www.dropbox.com/sh/h3ndhmoieoyl4g8/AABmxrOUBKIIXAUJPx5GtFpOa?dl=0
         static void Main(string[] args)
         {
-            string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
+            //string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
+            string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
             string textFileToWrite = "myFile.txt";
             string csvFileToWrite = "myFile.csv";
             string startHere = "Start Here...";
+            string allFileNames = "allFileNames.txt";
             char newLine = '\n';
             string saperatorLine = "=======================================================";
             StringBuilder stringBuilder = new StringBuilder();
@@ -31,10 +33,13 @@ namespace ConsoleApp1ReadPDFFile
             File.WriteAllText(textFileToWrite, startHere, Encoding.UTF8);
             File.WriteAllText(csvFileToWrite, csvHeaderRow + Environment.NewLine, Encoding.UTF8);
 
+            if (File.Exists(allFileNames))
+                File.Delete(allFileNames);
+
             int loopCounter = 1;
             foreach (var file in fileNames)
             {
-                File.AppendAllText("allFiles.txt", file+Environment.NewLine);
+                File.AppendAllText(allFileNames, file + Environment.NewLine);
                 //string normal = String.Empty;
                 //stringBuilder.AppendLine(loopCounter + ": " + file + newLine);
                 stringBuilder.AppendLine(file + newLine);
@@ -74,7 +79,8 @@ namespace ConsoleApp1ReadPDFFile
                 string row =
                     cSVString.AccountName + delemeter +
                     cSVString.AccountID + delemeter + delemeter +
-                    cSVString.InvoiceDate.ToString("d") + delemeter +
+                   // cSVString.InvoiceDate.ToString("d") + delemeter +
+                    cSVString.InvoiceDate + delemeter +
                     trans.TransectionAmount + delemeter +
                     cSVString.DocumentNumber + delemeter + delemeter + delemeter +
                     trans.TransectionDescription + delemeter +
@@ -127,7 +133,8 @@ namespace ConsoleApp1ReadPDFFile
                         cSVStructureClass.AccountID = ExtractNumberFromStringUsingColon(normal[i]);
                         break;
                     case 7:
-                        cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingColon(normal[i]);
+                        //cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingColon(normal[i]);
+                        cSVStructureClass.InvoiceDate = normal[i];
                         break;
                     case 10:
                     case 12:
@@ -326,7 +333,8 @@ namespace ConsoleApp1ReadPDFFile
         public string FileName { get; set; }
         public string AccountName { get; set; }
         public int AccountID { get; set; }
-        public DateTime InvoiceDate { get; set; }
+        //public DateTime InvoiceDate { get; set; }
+        public string InvoiceDate { get; set; }
         public int DocumentNumber { get; set; }
         public List<TransStructure> Transections { get; set; } = new List<TransStructure>();
     }
