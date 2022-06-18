@@ -16,8 +16,8 @@ namespace ConsoleApp1ReadPDFFile
         //https://www.dropbox.com/sh/h3ndhmoieoyl4g8/AABmxrOUBKIIXAUJPx5GtFpOa?dl=0
         static void Main(string[] args)
         {
-            //string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
-            string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
+            string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
+            //string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
             string textFileToWrite = "myFile.txt";
             string csvFileToWrite = "myFile.csv";
             string startHere = "Start Here...";
@@ -98,6 +98,15 @@ namespace ConsoleApp1ReadPDFFile
         {
             List<string> processList = new List<string>();
 
+            v = v.Replace(",", "0000000000");
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    v = v.Replace("  ", " ");
+            //}
+            //v = v.Replace("  ", " ");
+            //v = Regex.Replace(v, @"\s+", " ");
+            v = Regex.Replace(v, @"[^\S\n]+", " ");
+
             var stringArray = v.Split('\n').ToList();
             foreach (var item in stringArray)
             {
@@ -105,7 +114,8 @@ namespace ConsoleApp1ReadPDFFile
                 {
                     continue;
                 }
-                processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
+                //processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
+                processList.Add(item.Trim());
             }
 
             return processList;
@@ -124,17 +134,18 @@ namespace ConsoleApp1ReadPDFFile
                         cSVStructureClass.FileName = normal[i];
                         break;
                     case 4:
-                        cSVStructureClass.DocumentNumber = ExtractNumberFromStringUsingColon(normal[i]);
+                        cSVStructureClass.DocumentNumber = ExtractDateFromStringUsingSpace(normal[i]);
                         break;
                     case 5:
                         cSVStructureClass.AccountName = ReversString(ExtractAccountName(normal[i]));
                         break;
                     case 6:
-                        cSVStructureClass.AccountID = ExtractNumberFromStringUsingColon(normal[i]);
+                        cSVStructureClass.AccountID = ExtractDateFromStringUsingSpace(normal[i]);
                         break;
                     case 7:
                         //cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingColon(normal[i]);
-                        cSVStructureClass.InvoiceDate = normal[i];
+                        //cSVStructureClass.InvoiceDate = normal[i];
+                        cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingSpace(normal[i]);
                         break;
                     case 10:
                     case 12:
@@ -153,7 +164,7 @@ namespace ConsoleApp1ReadPDFFile
                     case 25:
                         if (CheckTransectionsFromString(normal[i]))
                         {
-                            float amountt = 0;
+                            string amountt = "0";
                             string payment = "";
                             string descipt = "";
                             TransStructure trans = new TransStructure();
@@ -245,15 +256,19 @@ namespace ConsoleApp1ReadPDFFile
         {
             int number = 0;
             var stringResulttt = value.Split(':').ToList();
+            if (stringResulttt.Count>2)
+            {
+                string sdfdf = "fsdfsdf";
+            }
             if (int.TryParse(stringResulttt[0], out number))
             {
                 return number;
             }
             return number;
         }
-        private static bool ExtractTransectionDetailsFromStringUsingSpace(string value, out float amount, out string paymentMethod, out string description)
+        private static bool ExtractTransectionDetailsFromStringUsingSpace(string value, out string amount, out string paymentMethod, out string description)
         {
-            amount = 0;
+            amount = "0";
             paymentMethod = null;
             description = null;
             int number = 0;
@@ -265,7 +280,7 @@ namespace ConsoleApp1ReadPDFFile
                     switch (i)
                     {
                         case 0:
-                            amount = float.Parse(stringResulttt[i].Trim());
+                            amount = stringResulttt[i].Trim();
                             //var resultString = Regex.Match(stringResulttt[i], @"\d+").Value;
                             //if (int.TryParse(resultString, out number))
                             //{
@@ -290,7 +305,37 @@ namespace ConsoleApp1ReadPDFFile
             //}
             return false;
         }
-
+        private static int ExtractDateFromStringUsingSpaceNumber(string value)
+        {
+            int number = 0;
+            string newee = value.Trim();
+            var stringResulttt = newee.Split(' ').ToList();
+            if (int.TryParse(stringResulttt[0], out number))
+            {
+                return number;
+            }
+            return int.Parse(stringResulttt[0]);
+        }
+        private static string ExtractDateFromStringUsingSpace(string value)
+        {
+            string newee = value.Trim();
+            var stringResulttt = newee.Split(' ').ToList();
+            //if (DateTime.TryParse(stringResulttt[0], out number))
+            //{
+            //    return number;
+            //}
+            return stringResulttt[0];
+        }
+        private static string ExtractDateFromStringUsingColonString(string value)
+        {
+            string newee = value.Trim();
+            var stringResulttt = newee.Split(':').ToList();
+            //if (DateTime.TryParse(stringResulttt[0], out number))
+            //{
+            //    return number;
+            //}
+            return stringResulttt[0];
+        }
         private static DateTime ExtractDateFromStringUsingColon(string value)
         {
             DateTime number = DateTime.MinValue;
@@ -332,15 +377,15 @@ namespace ConsoleApp1ReadPDFFile
     {
         public string FileName { get; set; }
         public string AccountName { get; set; }
-        public int AccountID { get; set; }
+        public string AccountID { get; set; }
         //public DateTime InvoiceDate { get; set; }
         public string InvoiceDate { get; set; }
-        public int DocumentNumber { get; set; }
+        public string DocumentNumber { get; set; }
         public List<TransStructure> Transections { get; set; } = new List<TransStructure>();
     }
     class TransStructure
     {
-        public float TransectionAmount { get; set; }
+        public string TransectionAmount { get; set; }
         public string TransectionDescription { get; set; }
         public string TransectionPaymentMethod { get; set; }
     }
