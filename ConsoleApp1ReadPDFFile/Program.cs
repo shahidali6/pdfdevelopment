@@ -16,7 +16,8 @@ namespace ConsoleApp1ReadPDFFile
         //https://www.dropbox.com/sh/h3ndhmoieoyl4g8/AABmxrOUBKIIXAUJPx5GtFpOa?dl=0
         static void Main(string[] args)
         {
-            string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF";
+            //string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF_half";
+            string path = @"C:\Users\shahid\Downloads\ShakedInvoicePDFFinal";
             //string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
             string textFileToWrite = "myFile.txt";
             string csvFileToWrite = "myFile.csv";
@@ -79,7 +80,7 @@ namespace ConsoleApp1ReadPDFFile
                 string row =
                     cSVString.AccountName + delemeter +
                     cSVString.AccountID + delemeter + delemeter +
-                   // cSVString.InvoiceDate.ToString("d") + delemeter +
+                    // cSVString.InvoiceDate.ToString("d") + delemeter +
                     cSVString.InvoiceDate + delemeter +
                     trans.TransectionAmount + delemeter +
                     cSVString.DocumentNumber + delemeter + delemeter + delemeter +
@@ -98,7 +99,7 @@ namespace ConsoleApp1ReadPDFFile
         {
             List<string> processList = new List<string>();
 
-            v = v.Replace(",", "0000000000");
+            v = v.Replace(",", "");
             //for (int i = 0; i < 5; i++)
             //{
             //    v = v.Replace("  ", " ");
@@ -134,18 +135,18 @@ namespace ConsoleApp1ReadPDFFile
                         cSVStructureClass.FileName = normal[i];
                         break;
                     case 4:
-                        cSVStructureClass.DocumentNumber = ExtractDateFromStringUsingSpace(normal[i]);
+                        cSVStructureClass.DocumentNumber = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
                     case 5:
                         cSVStructureClass.AccountName = ReversString(ExtractAccountName(normal[i]));
                         break;
                     case 6:
-                        cSVStructureClass.AccountID = ExtractDateFromStringUsingSpace(normal[i]);
+                        cSVStructureClass.AccountID = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
                     case 7:
                         //cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingColon(normal[i]);
                         //cSVStructureClass.InvoiceDate = normal[i];
-                        cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingSpace(normal[i]);
+                        cSVStructureClass.InvoiceDate = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
                     case 10:
                     case 12:
@@ -217,8 +218,15 @@ namespace ConsoleApp1ReadPDFFile
         private static string ReversString(string str)
         {
             string str2 = "";
-            for (int i = str.Length - 1; i >= 0; --i)
-                str2 += str[i];
+            if (Regex.IsMatch(str, @"\D"))
+            {
+                for (int i = str.Length - 1; i >= 0; --i)
+                    str2 += str[i];
+            }
+            else
+            {
+                str2 = str;
+            }
 
             return str2;
         }
@@ -235,7 +243,6 @@ namespace ConsoleApp1ReadPDFFile
         }
         private static string ExtractAccountName(string value)
         {
-            int number = 0;
             string result = "";
             var stringResulttt = value.Split(':').ToList();
             for (int i = 0; i < stringResulttt.Count; i++)
@@ -256,7 +263,7 @@ namespace ConsoleApp1ReadPDFFile
         {
             int number = 0;
             var stringResulttt = value.Split(':').ToList();
-            if (stringResulttt.Count>2)
+            if (stringResulttt.Count > 2)
             {
                 string sdfdf = "fsdfsdf";
             }
@@ -316,15 +323,12 @@ namespace ConsoleApp1ReadPDFFile
             }
             return int.Parse(stringResulttt[0]);
         }
-        private static string ExtractDateFromStringUsingSpace(string value)
+        private static string ExtractNumberFromStringUsingSpace(string value)
         {
-            string newee = value.Trim();
-            var stringResulttt = newee.Split(' ').ToList();
-            //if (DateTime.TryParse(stringResulttt[0], out number))
-            //{
-            //    return number;
-            //}
-            return stringResulttt[0];
+            string getString = value.Trim();
+            var listOfStrings = getString.Split(' ').ToList();
+
+            return listOfStrings[0];
         }
         private static string ExtractDateFromStringUsingColonString(string value)
         {
