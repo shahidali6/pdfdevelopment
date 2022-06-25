@@ -17,8 +17,9 @@ namespace ConsoleApp1ReadPDFFile
         static void Main(string[] args)
         {
             //string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF_half";
-            string path = @"C:\Users\shahid\Downloads\ShakedInvoicePDFFinal";
-            //string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
+            //string path = @"C:\Users\shahid\Downloads\ShakedInvoicePDFFinal";
+           // string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
+            string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF_full";
             string textFileToWrite = "myFile.txt";
             string csvFileToWrite = "myFile.csv";
             string startHere = "Start Here...";
@@ -118,7 +119,8 @@ namespace ConsoleApp1ReadPDFFile
                 //processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
                 processList.Add(item.Trim());
             }
-
+            string deleimeter = ",";
+            File.AppendAllText("detail.txt",processList[0]+ deleimeter+ stringArray.Count+deleimeter+processList.Count+Environment.NewLine, Encoding.UTF8);
             return processList;
         }
 
