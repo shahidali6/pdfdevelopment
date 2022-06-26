@@ -18,7 +18,7 @@ namespace ConsoleApp1ReadPDFFile
         {
             //string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF_half";
             //string path = @"C:\Users\shahid\Downloads\ShakedInvoicePDFFinal";
-           // string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
+            // string path = @"C:\Users\msaddique\Downloads\Shaked Invoice PDF";
             string path = @"C:\Users\shahid\Downloads\Shaked Invoice PDF_full";
             string textFileToWrite = "myFile.txt";
             string csvFileToWrite = "myFile.csv";
@@ -42,34 +42,27 @@ namespace ConsoleApp1ReadPDFFile
             foreach (var file in fileNames)
             {
                 File.AppendAllText(allFileNames, file + Environment.NewLine);
-                //string normal = String.Empty;
-                //stringBuilder.AppendLine(loopCounter + ": " + file + newLine);
                 stringBuilder.AppendLine(file + newLine);
                 loopCounter++;
 
-                //normal = loopCounter + ": " + file + newLine + saperatorLine + newLine;
                 using (PdfReader reader = new PdfReader(file))
                 {
                     for (int i = 1; i <= reader.NumberOfPages; i++)
                     {
                         stringBuilder.Append(PdfTextExtractor.GetTextFromPage(reader, i));
-                        //normal += PdfTextExtractor.GetTextFromPage(reader, i);
                     }
-                    //File.AppendAllText(fileToWrite1, normal + Environment.NewLine, Encoding.UTF8);
                 }
                 var processedString = StringToProcessList(stringBuilder.ToString());
                 stringBuilder.Clear();
 
                 list2Csv(processedString);
 
-                //var CSVString = ExtractInformationFromString(processedString);
+                var CSVString = ExtractInformationFromString(processedString);
 
-                //var populatedcsv = CSVStringPopulator(CSVString);
+                var populatedcsv = CSVStringPopulator(CSVString);
 
                 File.AppendAllLines(textFileToWrite, processedString, Encoding.UTF8);
-                //File.AppendAllLines(csvFileToWrite, populatedcsv, Encoding.UTF8);
-
-                //ExtractInformationFromString(processedString);
+                File.AppendAllLines(csvFileToWrite, populatedcsv, Encoding.UTF8);
             }
         }
         public static void list2Csv(List<string> list)
@@ -101,20 +94,12 @@ namespace ConsoleApp1ReadPDFFile
             }
 
             return kdkfkdkf;
-            //throw new NotImplementedException();
         }
 
         private static List<string> StringToProcessList(string v)
         {
             List<string> processList = new List<string>();
-
             v = v.Replace(",", "");
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    v = v.Replace("  ", " ");
-            //}
-            //v = v.Replace("  ", " ");
-            //v = Regex.Replace(v, @"\s+", " ");
             v = Regex.Replace(v, @"[^\S\n]+", " ");
 
             var stringArray = v.Split('\n').ToList();
@@ -123,16 +108,16 @@ namespace ConsoleApp1ReadPDFFile
             {
                 if (loopCounter == 0) processList.Add(item.Trim());
                 loopCounter++;
-                if (string.IsNullOrEmpty(item)) continue;   
-                if (!char.IsDigit(item[0])) continue; 
-                if (item.StartsWith("03-5717040")) continue;   
-                if (item.StartsWith("03-6877444")) continue;   
+                if (string.IsNullOrEmpty(item)) continue;
+                if (!char.IsDigit(item[0])) continue;
+                if (item.StartsWith("03-5717040")) continue;
+                if (item.StartsWith("03-6877444")) continue;
 
                 //processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
                 processList.Add(item.Trim());
             }
             string deleimeter = ",";
-            File.AppendAllText("detail.csv",processList[0]+ deleimeter+ stringArray.Count+deleimeter+processList.Count+Environment.NewLine, Encoding.UTF8);
+            File.AppendAllText("detail.csv", processList[0] + deleimeter + stringArray.Count + deleimeter + processList.Count + Environment.NewLine, Encoding.UTF8);
             return processList;
         }
 
@@ -145,24 +130,34 @@ namespace ConsoleApp1ReadPDFFile
             {
                 switch (i)
                 {
+                    //File name
                     case 0:
                         cSVStructureClass.FileName = normal[i];
                         break;
-                    case 4:
+                    //Document Number
+                    case 1:
                         cSVStructureClass.DocumentNumber = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
-                    case 5:
+                    //Account Name
+                    case 2:
                         cSVStructureClass.AccountName = ReversString(ExtractAccountName(normal[i]));
                         break;
-                    case 6:
+                    //Account ID
+                    case 3:
                         cSVStructureClass.AccountID = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
-                    case 7:
-                        //cSVStructureClass.InvoiceDate = ExtractDateFromStringUsingColon(normal[i]);
-                        //cSVStructureClass.InvoiceDate = normal[i];
+                    //Invoice date
+                    case 4:
                         cSVStructureClass.InvoiceDate = ExtractNumberFromStringUsingSpace(normal[i]);
                         break;
+                    //Trasection detail
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
                     case 10:
+                    case 11:
                     case 12:
                     case 13:
                     case 14:
@@ -173,15 +168,9 @@ namespace ConsoleApp1ReadPDFFile
                     case 19:
                     case 20:
                     case 21:
-                    case 22:
-                    case 23:
-                    case 24:
-                    case 25:
                         if (CheckTransectionsFromString(normal[i]))
                         {
-                            string amountt = "0";
-                            string payment = "";
-                            string descipt = "";
+                            string amountt, payment, descipt = "-1";
                             TransStructure trans = new TransStructure();
                             var statue = ExtractTransectionDetailsFromStringUsingSpace(normal[i], out amountt, out payment, out descipt);
 
@@ -190,11 +179,6 @@ namespace ConsoleApp1ReadPDFFile
                             trans.TransectionDescription = descipt;
 
                             cSVStructureClass.Transections.Add(trans);
-
-                            //cSVStructureClass.Transections.TransectionAmount.Add(amountt);
-                            //cSVStructureClass.TransectionPaymentMethod.Add(payment);
-                            //cSVStructureClass.TransectionDescription.Add(descipt);
-                            // cSVStructureClass.TransectionAmount.Add(ExtractTransectionDetailsFromStringUsingSpace(normal[i]));
                         }
                         break;
                     default:
@@ -202,32 +186,6 @@ namespace ConsoleApp1ReadPDFFile
                 }
             }
             return cSVStructureClass;
-
-            //List<CSVStructureClass> listCSV = new List<CSVStructureClass>();
-
-            //var stringArray = normal.Split('\n').ToList();
-            //List<string> mainList = new List<string>();
-
-            //foreach (var item in stringArray)
-            //{
-            //    if (String.IsNullOrWhiteSpace(item))
-            //    {
-            //        continue;
-            //    }
-            //    var processedString = Regex.Replace(item, @"\s+", " ").Trim();
-            //    mainList.Add(processedString);
-            //}
-
-            //if (mainList.Count() < 15)
-            //{
-            //    Console.WriteLine("sddfdfd");
-            //}
-            ////throw new NotImplementedException();
-            //if (mainList.Count() > 15)
-            //{
-
-
-            //}
         }
         private static string ReversString(string str)
         {
@@ -289,7 +247,7 @@ namespace ConsoleApp1ReadPDFFile
         }
         private static bool ExtractTransectionDetailsFromStringUsingSpace(string value, out string amount, out string paymentMethod, out string description)
         {
-            amount = "0";
+            amount = "-1";
             paymentMethod = null;
             description = null;
             int number = 0;
@@ -302,11 +260,6 @@ namespace ConsoleApp1ReadPDFFile
                     {
                         case 0:
                             amount = stringResulttt[i].Trim();
-                            //var resultString = Regex.Match(stringResulttt[i], @"\d+").Value;
-                            //if (int.TryParse(resultString, out number))
-                            //{
-                            //    return number;
-                            //}
                             break;
                         case 4:
                             paymentMethod = ReversString(stringResulttt[i]).Trim();
@@ -320,10 +273,6 @@ namespace ConsoleApp1ReadPDFFile
                 }
                 return true;
             }
-            //if (int.TryParse(stringResulttt[0], out number))
-            //{
-            //    return number;
-            //}
             return false;
         }
         private static int ExtractDateFromStringUsingSpaceNumber(string value)
