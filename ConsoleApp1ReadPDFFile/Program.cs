@@ -60,15 +60,23 @@ namespace ConsoleApp1ReadPDFFile
                 var processedString = StringToProcessList(stringBuilder.ToString());
                 stringBuilder.Clear();
 
-                var CSVString = ExtractInformationFromString(processedString);
+                list2Csv(processedString);
 
-                var populatedcsv = CSVStringPopulator(CSVString);
+                //var CSVString = ExtractInformationFromString(processedString);
+
+                //var populatedcsv = CSVStringPopulator(CSVString);
 
                 File.AppendAllLines(textFileToWrite, processedString, Encoding.UTF8);
-                File.AppendAllLines(csvFileToWrite, populatedcsv, Encoding.UTF8);
+                //File.AppendAllLines(csvFileToWrite, populatedcsv, Encoding.UTF8);
 
                 //ExtractInformationFromString(processedString);
             }
+        }
+        public static void list2Csv(List<string> list)
+        {
+            string csv = String.Join(Environment.NewLine, list.Select(x => x.ToString()).ToArray());
+
+            File.AppendAllLines("onlyDetail.csv", list);
         }
 
         private static List<string> CSVStringPopulator(CSVStructureClass cSVString)
@@ -110,17 +118,21 @@ namespace ConsoleApp1ReadPDFFile
             v = Regex.Replace(v, @"[^\S\n]+", " ");
 
             var stringArray = v.Split('\n').ToList();
+            int loopCounter = 0;
             foreach (var item in stringArray)
             {
-                if (String.IsNullOrWhiteSpace(item))
-                {
-                    continue;
-                }
+                if (loopCounter == 0) processList.Add(item.Trim());
+                loopCounter++;
+                if (string.IsNullOrEmpty(item)) continue;   
+                if (!char.IsDigit(item[0])) continue; 
+                if (item.StartsWith("03-5717040")) continue;   
+                if (item.StartsWith("03-6877444")) continue;   
+
                 //processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
                 processList.Add(item.Trim());
             }
             string deleimeter = ",";
-            File.AppendAllText("detail.txt",processList[0]+ deleimeter+ stringArray.Count+deleimeter+processList.Count+Environment.NewLine, Encoding.UTF8);
+            File.AppendAllText("detail.csv",processList[0]+ deleimeter+ stringArray.Count+deleimeter+processList.Count+Environment.NewLine, Encoding.UTF8);
             return processList;
         }
 
