@@ -101,6 +101,7 @@ namespace ConsoleApp1ReadPDFFile
             List<string> processList = new List<string>();
             v = v.Replace(",", "");
             v = Regex.Replace(v, @"[^\S\n]+", " ");
+            bool endDetector = false;
 
             var stringArray = v.Split('\n').ToList();
             int loopCounter = 0;
@@ -112,9 +113,10 @@ namespace ConsoleApp1ReadPDFFile
                 if (!char.IsDigit(item[0])) continue;
                 if (item.StartsWith("03-5717040")) continue;
                 if (item.StartsWith("03-6877444")) continue;
+                if (item.Contains("%")) { endDetector = true; continue; }
 
                 //processList.Add(Regex.Replace(item, @"\s+", " ").Trim());
-                processList.Add(item.Trim());
+                if (!endDetector) processList.Add(item.Trim());
             }
             string deleimeter = ",";
             File.AppendAllText("detail.csv", processList[0] + deleimeter + stringArray.Count + deleimeter + processList.Count + Environment.NewLine, Encoding.UTF8);
